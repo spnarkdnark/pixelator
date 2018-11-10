@@ -50,7 +50,7 @@ def load_and_crop_images(file_path, size):
     return empty
 
 
-def save_new_images(images, file_path):
+def save_to_directory(images, file_path):
     """
     Writes images in dictionary generated from load_and_crop into new folder
     :param images: Images dictionary
