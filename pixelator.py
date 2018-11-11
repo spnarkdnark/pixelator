@@ -105,10 +105,10 @@ def draw_rectangle(im, x, y, pixel_size, color, modifier = False, mod_type = Fal
             return im.rectangle((x, y+modifier, x+pixel_size, y+pixel_size-modifier), color,(color[0]-20,color[1]-20,color[2]-20))
 
     else:
-        return im.rectangle([x, y, x + pixel_size, y+pixel_size], color,(color[0]-20,color[1]-20,color[2]-20))
+        return im.rectangle([x, y, x + pixel_size, y+pixel_size], color,)
 
 
-def render(file, pixel_size, modifier = False, mod_type = False):
+def render(image, pixel_size, modifier = False, mod_type = False, mask = False):
 
     """
     Draw a new image object, pixelated based on pixel_size
@@ -117,18 +117,24 @@ def render(file, pixel_size, modifier = False, mod_type = False):
     :return: an output object ready to be shown, saved, etc.
     """
 
-    image = get_input_image(file)  # Set image to PIL image object using get_input_image()
     width = image.width  # Set image.width and height to be used in loops
     height = image.height
     image_array = convert_image_data(image)  # Set image_array for use in get_square and get_pixel_avg
-    blank_image = Image.new('RGB', image.size, (255, 255, 255))  # Create new blank image to be drawn on
+    blank_image = Image.new('RGBA', image.size, (255, 255, 255,0))  # Create new blank image to be drawn on
     draw_object = ImageDraw.Draw(blank_image)  # Create Draw object from new blank image for Draw functions
 
     for x in range(0, width, pixel_size):  # loop through (x,y) values in width/height of image object
         for y in range(0, height, pixel_size):  # -pixel_size to ensure boundary isn't violated
             sq = get_square((x, y), pixel_size, image_array)  # get square slice from input image object
             color = get_pixel_avg(sq)  # calculate avg color of square at given point in image object
-            draw_rectangle(draw_object, x, y, pixel_size,color, modifier,mod_type)  # draw a shape at that point in the blank_image
+            if mask:
+                if sum(mask[1:2]) - sum(color[1:2]) < 15:
+                    continue
+                else:
+                    draw_rectangle(draw_object, x, y, pixel_size, color, modifier,
+                                   mod_type)  # draw a shape at that point in the blank_image
+            else:
+                draw_rectangle(draw_object, x, y, pixel_size,color, modifier,mod_type)  # draw a shape at that point in the blank_image
 
     return blank_image  # Return completed pixel object
 
