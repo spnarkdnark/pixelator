@@ -1,6 +1,7 @@
 from PIL import Image, ImageDraw
 from random import randint
 import os
+from math import sqrt
 
 
 def get_input_image(filename):
@@ -108,6 +109,10 @@ def draw_rectangle(im, x, y, pixel_size, color, modifier = False, mod_type = Fal
         return im.rectangle([x, y, x + pixel_size, y+pixel_size], color,)
 
 
+def equild(color1,color2):
+    return sqrt(((abs(color1[0]-color2[0]))**2)+((abs(color1[1]-color2[1]))**2)+((abs(color1[2]-color2[2]))**2))
+
+
 def render(image, pixel_size, modifier = False, mod_type = False, mask = False):
 
     """
@@ -128,7 +133,7 @@ def render(image, pixel_size, modifier = False, mod_type = False, mask = False):
             sq = get_square((x, y), pixel_size, image_array)  # get square slice from input image object
             color = get_pixel_avg(sq)  # calculate avg color of square at given point in image object
             if mask:
-                if sum(mask[1:2]) - sum(color[1:2]) < 15:
+                if equild(color,mask) < 60:
                     continue
                 else:
                     draw_rectangle(draw_object, x, y, pixel_size, color, modifier,
@@ -173,4 +178,5 @@ def save_to_directory(images, file_path):
     for filename, image in images.items():
         full_path = os.path.join(file_path, filename)
         image.save(full_path)
+
 
